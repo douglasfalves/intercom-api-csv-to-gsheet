@@ -235,13 +235,33 @@ function fillDataOnly(){
   //                   'A importação na planilha do Intercom acabou!',
   //                   'Dá uma olhada lá:' + idSheets);
 
-  // deleteIds(); // limpa os ids na params para um trabalho limpo
+}
+
+function setFirstLastRow(){
+
+var painel = SpreadsheetApp.getActive().getSheetByName("Painel");
+var lista = SpreadsheetApp.getActive().getSheetByName("listas").getRange('A:A').getDisplayValues();
+  
+  var first = '';
+  var last = '';
+
+  for(var i=0;i<lista.length; i++){
+    if(i==0){first = lista[i];}
+    if(lista[i] != '' ){last = lista[i];}
+  }
+
+  console.log(first);
+  console.log(last);
+
+  painel.getRange('A4').setValue(first);
+  painel.getRange('A6').setValue(last);
+
 }
 
 
 
 
-// EXTRA | Para o uso nos botões de correção
+// EXTRA | Para o uso nos botões de correção -------------------------------------------------------------------------------------------
 
 
 function getUrlButton(){ // CHECAR
@@ -322,33 +342,7 @@ function retrieveIntercomZip(dUrl){ // CHECAR
   //                   'A importação na planilha do Intercom acabou!',
   //                   'Dá uma olhada lá:' + idSheets);
 
-  // deleteIds(); // limpa os ids na params
   deleteTriggers(); // limpa gatilhos
 
   return sheet.getName();
 }
-
-function setFirstLastRow(){
-
-var painel = SpreadsheetApp.getActive().getSheetByName("Painel");
-var lista = SpreadsheetApp.getActive().getSheetByName("listas").getRange('A:A').getDisplayValues();
-  
-  var first = '';
-  var last = '';
-
-  for(var i=0;i<lista.length; i++){
-    if(i==0){first = lista[i];}
-    if(lista[i] != '' ){last = lista[i];}
-  }
-
-  console.log(first);
-  console.log(last);
-
-  painel.getRange('A4').setValue(first);
-  painel.getRange('A6').setValue(last);
-
-}
-
-
-
-
