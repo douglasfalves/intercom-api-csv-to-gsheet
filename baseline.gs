@@ -10,27 +10,26 @@ function cacheData(data) {
 }
 
 function main() {
-  initSpreadsheet();
-  deleteIds();
-  deleteTriggers();
-  params = getParamsRange();
-  makePost(params); // finaliza criando um gatilho checando a URL a partir do ID do job no Intercom
+  initSpreadsheet(); // Limpa a planilha para dar aquele alerta de que algo está rolando
+  deleteIds(); // Limpa o ID e a URL do passado para dar espaço aos novos
+  deleteTriggers(); // Limpa qualquer gatilho que esteja preso
+  params = getParamsRange(); // Pega as datas para fazer o GET
+  makePost(params); // finaliza fazendo um POST e criando um gatilho que gera um GET que checa se tem a URL a partir do ID do job no Intercom
 }
 
 function afterGet(dUrl){ //fluxo padrão pós URL obtida
-  deleteTriggers();  
-  initSpreadsheet();
-  cacheData(retrieveIntercomZipOnly(dUrl));
-  fillDataOnly();
-  waitSetDates();
-  waitLimpaCSV();
+  deleteTriggers(); // Limpa os gatilhos dos GET's da URL 
+  initSpreadsheet(); // Limpa a planilha para ter certeza
+  cacheData(retrieveIntercomZipOnly(dUrl)); // Cacheia o CSV globalmente
+  fillDataOnly(); // Escreve o CSV na planilha
+  waitLimpaCSV(); // Cria o gatilho de 60 segundos para formatar as datas
+  waitSetDates(); // Cria o gatilho de 60 segundos para escrever as datas nos filtros 
 }
 
 function onOpen() {
  var menuItems = [
-   {name: 'Começar', functionName: 'main'}
-   // fazer pedido de CSV
-   ,{name: 'Formatar os dados', functionName: 'limpaCSV'}
+   {name: 'Começar', functionName: 'main'} // Trabalho completo do inicio ao fim
+   ,{name: 'Formatar os dados', functionName: 'limpaCSV'} // Limpa as datas caso tenha demorado muito para escrever o CSV
    ,{name: '(Sem URL) Download', functionName: 'getUrlButton'} // Pegar a URL pelo botão caso o getUrl padrão tenha falhado
    ,{name: '(Com URL) Download', functionName: 'retrieveIntercomZip'} // Faz o download quando já se tem a URL
  ];
@@ -201,6 +200,8 @@ function limpaCSV(){
 
   displayToastAlert('Tudo limpo!');
   msg = ui.alert("Finalizado!");
+
+  setFirstLastRow();
 }
 
 function retrieveIntercomZipOnly(dUrl){
@@ -319,7 +320,7 @@ function getUrlButton(){ // CHECAR
   return dUrl;
 }
 
-function pegaUrlPlanilha(){
+function pegaUrlPlanilha(){ // Só existe aqui nos extras por conta que nas funcções acima isso já está dentro das funções.
   var paramsSheet = spreadsheet.getSheetByName("params");
   var sUrl = paramsSheet.getRange(5, 2, 1, 1).getDisplayValue(); // pega a URL da planilha
   return sUrl;
