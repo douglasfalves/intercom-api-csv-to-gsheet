@@ -23,6 +23,7 @@ function afterGet(dUrl){ //fluxo padrão pós URL obtida
   cacheData(retrieveIntercomZipOnly(dUrl));
   fillDataOnly();
   waitSetDates();
+  waitLimpaCSV();
 }
 
 function onOpen() {
@@ -162,8 +163,8 @@ function getUrl(){
 
   if(dUrl != ''){ // se tiver a url de download, limpa 
     displayToastAlert('Checando URL: ' + dUrl);
-    escreveURLparams(dUrl);
-    afterGet(dUrl);      
+    escreveURLparams(dUrl); // escreve a URL na planilha
+    afterGet(dUrl); // inicia o segundo "main"
   }
   else{ // se não tiver, vai gerar mais um gatilho até dUrl for preenchido
     wait();
@@ -229,11 +230,25 @@ function fillDataOnly(){
 
   sheet.getRange(1, 1, csv.length, csv[0].length).setValues(csv);
 
-  
-
   // MailApp.sendEmail(userMail,
   //                   'A importação na planilha do Intercom acabou!',
   //                   'Dá uma olhada lá:' + idSheets);
+
+}
+
+function fillDataOnlyTESTE(){ // Testing a loop of arrays instead of using setValues
+  var sheet = spreadsheet.getSheetByName("CSV");
+  csv = this.dataCached;
+  //sheet.getRange(1, 1, csv.length, csv[0].length).setValues(csv);
+
+  var outerArray = [], innerArray = [];
+
+  for(var i=0, lenCSV=csv.length; i<lenCSV; i++){
+    innerArray.push(new Array(csv[i]));
+    outerArray.push(innerArray);
+  }
+
+  sheet.getRange(1, 1, innerArray.length, outerArray[0].length).setValues(outerArray);
 
 }
 
@@ -310,12 +325,12 @@ function pegaUrlPlanilha(){
   return sUrl;
 }
 
-function retrieveIntercomZip(dUrl){ // CHECAR
+function retrieveIntercomZip(dUrl){ // CHECAR funcionamento desse botão
   
   if(dUrl == null){
     dUrl = pegaUrlPlanilha();
   }
-  
+
   displayToastAlert('Fazendo Download...');
 
   var options =
@@ -332,17 +347,9 @@ function retrieveIntercomZip(dUrl){ // CHECAR
 
   displayToastAlert('Consegui pegar o CSV');
 
+  this.dataCached = csv
+
   initSpreadsheet();
+  fillDataOnly(csv);
 
-  var sheet = spreadsheet.getSheetByName("CSV");
- sheet.getRange(1, 1, csv.length, csv[0].length).setValues(csv);
-
-
-  // MailApp.sendEmail(userMail,
-  //                   'A importação na planilha do Intercom acabou!',
-  //                   'Dá uma olhada lá:' + idSheets);
-
-  deleteTriggers(); // limpa gatilhos
-
-  return sheet.getName();
 }
